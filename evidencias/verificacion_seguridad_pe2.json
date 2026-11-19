@@ -1,0 +1,40 @@
+[
+  {
+    "ok": true,
+    "intentos": 1,
+    "salida": {
+      "caso_id": "MC-0004",
+      "prioridad": "bloqueada",
+      "canal_recomendado": "ninguno",
+      "fundamento": "El tipo de consulta es 'ambigua', por lo que se bloquea la prioridad y no se recomienda ningún canal de contacto hasta que se aclare la información. Se requiere supervisión para resolver la contradicción y definir el siguiente paso.",
+      "requiere_supervision": true,
+      "confianza": 0.7
+    },
+    "metricas": {
+      "modelo": "gpt-4.1-mini-2025-04-14",
+      "tokens_entrada": 451,
+      "tokens_salida": 92,
+      "costo_usd": 0.0003276,
+      "latencia_ms": 2339
+    }
+  },
+  {
+    "ok": true,
+    "intentos": 1,
+    "salida": {
+      "caso_id": "MC-0005",
+      "prioridad": "bloqueada",
+      "canal_recomendado": "ninguno",
+      "fundamento": "El tipo de consulta es fuera_de_tema, por lo que según las reglas se bloquea la prioridad y no se recomienda ningún canal. Se requiere supervisión para manejar adecuadamente este caso, ya que no es pertinente para cobranza.",
+      "requiere_supervision": true,
+      "confianza": 0.9
+    },
+    "metricas": {
+      "modelo": "gpt-4.1-mini-2025-04-14",
+      "tokens_entrada": 452,
+      "tokens_salida": 92,
+      "costo_usd": 0.000328,
+      "latencia_ms": 1390
+    }
+  }
+]

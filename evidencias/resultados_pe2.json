@@ -1,0 +1,52 @@
+[
+  {
+    "caso": "MC-0001",
+    "tipo": "normal",
+    "valido": true,
+    "tokens_entrada": 426,
+    "tokens_salida": 66,
+    "costo_usd": 0.000276,
+    "latencia_ms": 2381,
+    "intentos": 1
+  },
+  {
+    "caso": "MC-0002",
+    "tipo": "normal",
+    "valido": true,
+    "tokens_entrada": 425,
+    "tokens_salida": 71,
+    "costo_usd": 0.0002836,
+    "latencia_ms": 1574,
+    "intentos": 1
+  },
+  {
+    "caso": "MC-0003",
+    "tipo": "prohibido",
+    "valido": true,
+    "tokens_entrada": 421,
+    "tokens_salida": 66,
+    "costo_usd": 0.000274,
+    "latencia_ms": 1554,
+    "intentos": 1
+  },
+  {
+    "caso": "MC-0004",
+    "tipo": "ambiguo",
+    "valido": true,
+    "tokens_entrada": 437,
+    "tokens_salida": 77,
+    "costo_usd": 0.000298,
+    "latencia_ms": 1851,
+    "intentos": 1
+  },
+  {
+    "caso": "MC-0005",
+    "tipo": "fuera_de_tema",
+    "valido": true,
+    "tokens_entrada": 435,
+    "tokens_salida": 74,
+    "costo_usd": 0.0002924,
+    "latencia_ms": 1282,
+    "intentos": 1
+  }
+]

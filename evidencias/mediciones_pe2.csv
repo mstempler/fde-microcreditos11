@@ -1,0 +1,6 @@
+caso,tipo,valido,tokens_entrada,tokens_salida,costo_usd,latencia_ms,intentos
+MC-0001,normal,True,426,66,0.000276,2381,1
+MC-0002,normal,True,425,71,0.0002836,1574,1
+MC-0003,prohibido,True,421,66,0.000274,1554,1
+MC-0004,ambiguo,True,437,77,0.000298,1851,1
+MC-0005,fuera_de_tema,True,435,74,0.0002924,1282,1

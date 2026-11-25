@@ -1,0 +1,41 @@
+name: Medición real PE2
+
+on:
+  pull_request:
+    types: [synchronize]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  medir:
+    if: >-
+      github.event.number == 1 &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.head_ref == 'pe2/hito1-manejo-errores-openai' &&
+      github.event.before == 'd6d1d988e580fb761b097cb77dab02779736ff59'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements.txt
+      - name: Ejecutar cinco casos sintéticos
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-4.1-mini
+        run: |
+          git rev-parse HEAD
+          python medir_pe2.py --salida corrida-pe2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mediciones-pe2
+          path: corrida-pe2/
+          if-no-files-found: error

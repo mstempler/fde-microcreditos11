@@ -1,0 +1,111 @@
+{
+  "commit_medido": "3642a0332fdd8b157e3c8aee5095ecfbff0c71e8",
+  "ejecucion": "https://github.com/mstempler/fde-microcreditos11/actions/runs/45628736825",
+  "casos": [
+    {
+      "caso": "MC-0001",
+      "tipo": "normal",
+      "ok": true,
+      "intentos": 1,
+      "salida": {
+        "caso_id": "MC-0001",
+        "prioridad": "media",
+        "canal_recomendado": "whatsapp",
+        "fundamento": "El caso presenta una mora temprana de 12 días con un importe moderado. Se recomienda priorizar contacto por whatsapp, que es un canal habilitado, para intentar comunicación efectiva. Se descarta telefono por no estar habilitado y email aunque habilitado es menos inmediato. No hay contacto prohibido ni tipo consulta ambigua, por lo que se asigna prioridad media.",
+        "requiere_supervision": false,
+        "confianza": 0.75
+      },
+      "metricas": {
+        "modelo": "gpt-4.1-mini-2025-04-14",
+        "tokens_entrada": 447,
+        "tokens_salida": 117,
+        "costo_usd": 0.000366,
+        "latencia_ms": 3052
+      }
+    },
+    {
+      "caso": "MC-0002",
+      "tipo": "normal",
+      "ok": true,
+      "intentos": 1,
+      "salida": {
+        "caso_id": "MC-0002",
+        "prioridad": "media",
+        "canal_recomendado": "telefono",
+        "fundamento": "El caso presenta una mora temprana de 28 días con importe vencido significativo. No hay contacto prohibido ni tipo de consulta ambiguo. Se recomienda priorizar media debido a la edad de la deuda y utilizar el canal telefono, que está habilitado y puede permitir un contacto más directo para la gestión de cobranza. La confianza es moderada dado que no hay políticas específicas; la recomendación se basa en la experiencia común para casos semejantes.",
+        "requiere_supervision": false,
+        "confianza": 0.7
+      },
+      "metricas": {
+        "modelo": "gpt-4.1-mini-2025-04-14",
+        "tokens_entrada": 446,
+        "tokens_salida": 132,
+        "costo_usd": 0.0003896,
+        "latencia_ms": 2146
+      }
+    },
+    {
+      "caso": "MC-0003",
+      "tipo": "prohibido",
+      "ok": true,
+      "intentos": 1,
+      "salida": {
+        "caso_id": "MC-0003",
+        "prioridad": "bloqueada",
+        "canal_recomendado": "ninguno",
+        "fundamento": "El contacto está expresamente prohibido para este caso, por lo que no se recomienda ningún canal y se bloquea la prioridad. Se requiere supervisión para asegurar el cumplimiento de esta restricción.",
+        "requiere_supervision": true,
+        "confianza": 0.9
+      },
+      "metricas": {
+        "modelo": "gpt-4.1-mini-2025-04-14",
+        "tokens_entrada": 442,
+        "tokens_salida": 83,
+        "costo_usd": 0.0003096,
+        "latencia_ms": 2475
+      }
+    },
+    {
+      "caso": "MC-0004",
+      "tipo": "ambiguo",
+      "ok": true,
+      "intentos": 1,
+      "salida": {
+        "caso_id": "MC-0004",
+        "prioridad": "bloqueada",
+        "canal_recomendado": "ninguno",
+        "fundamento": "El caso se clasifica como ambiguo debido a información contradictoria sobre la disponibilidad de contacto, lo que impide recomendar un canal. Según las reglas establecidas, en casos ambiguos se bloquea la prioridad y no se recomienda canal, además requiere supervisión para aclarar la situación.",
+        "requiere_supervision": true,
+        "confianza": 0.5
+      },
+      "metricas": {
+        "modelo": "gpt-4.1-mini-2025-04-14",
+        "tokens_entrada": 456,
+        "tokens_salida": 102,
+        "costo_usd": 0.0003456,
+        "latencia_ms": 1994
+      }
+    },
+    {
+      "caso": "MC-0005",
+      "tipo": "fuera_de_tema",
+      "ok": true,
+      "intentos": 1,
+      "salida": {
+        "caso_id": "MC-0005",
+        "prioridad": "bloqueada",
+        "canal_recomendado": "ninguno",
+        "fundamento": "La consulta es fuera de tema respecto a la cobranza, por lo que no se recomienda ninguna acción de contacto. Se bloquea prioridad y se requiere supervisión para evitar gestiones inapropiadas.",
+        "requiere_supervision": true,
+        "confianza": 0.9
+      },
+      "metricas": {
+        "modelo": "gpt-4.1-mini-2025-04-14",
+        "tokens_entrada": 457,
+        "tokens_salida": 85,
+        "costo_usd": 0.0003188,
+        "latencia_ms": 2016
+      }
+    }
+  ]
+}

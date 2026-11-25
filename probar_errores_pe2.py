@@ -1,4 +1,5 @@
 import json
+import os
 from unittest.mock import patch, MagicMock
 
 from src.motor import ejecutar_motor
@@ -24,6 +25,7 @@ def respuesta_simulada(datos):
     return r
 
 
+@patch.dict(os.environ, {"OPENAI_API_KEY": "clave-simulada-pe2"})
 def probar_reintento():
     invalida = {
         "caso_id": "MC-0004",
@@ -60,6 +62,7 @@ def probar_reintento():
     print(json.dumps(resultado, indent=2, ensure_ascii=False))
 
 
+@patch.dict(os.environ, {"OPENAI_API_KEY": "clave-simulada-pe2"})
 def probar_error_persistente():
     invalida = {
         "caso_id": "MC-0004",

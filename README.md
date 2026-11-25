@@ -24,7 +24,7 @@ cuentas ni autoriza acuerdos.
 ```powershell
 git clone https://github.com/mstempler/fde-microcreditos11.git
 cd fde-microcreditos11
-git switch pe2/hito1-manejo-errores-openai
+git switch --detach refs/tags/pe2
 py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
@@ -111,7 +111,8 @@ millón de tokens de entrada y USD 1,60 por millón de tokens de salida.
 - [Cinco respuestas completas y métricas](evidencias/corrida_pe2_2026-11-25.json).
 - [Registro de la corrida real](https://github.com/mstempler/fde-microcreditos11/actions/runs/45628736825).
 - [Ejecución de la suite con dependencias fijadas](https://github.com/mstempler/fde-microcreditos11/actions/runs/45628735545).
-- [Etiqueta histórica `pe2` (`033ef51`)](https://github.com/mstempler/fde-microcreditos11/tree/pe2).
+- [Versión de entrega `pe2`](https://github.com/mstempler/fde-microcreditos11/tree/pe2).
+- [Referencia histórica `pe2-historico` (`033ef51`)](https://github.com/mstempler/fde-microcreditos11/tree/pe2-historico).
 
 ## KPI y limitaciones
 

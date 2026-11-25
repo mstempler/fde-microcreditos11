@@ -7,8 +7,10 @@ from dotenv import load_dotenv
 from openai import (
     OpenAI,
     APIConnectionError,
+    APIError,
     APITimeoutError,
     APIStatusError,
+    OpenAIError,
 )
 from pydantic import ValidationError
 
@@ -122,11 +124,22 @@ def ejecutar_motor(datos: dict):
             0,
         )
 
-    client = OpenAI(
-        api_key=os.environ["OPENAI_API_KEY"],
-        max_retries=0,
-        timeout=30.0,
-    )
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if not api_key:
+        return error_estructurado(
+            "configuracion_api",
+            {"campo": "OPENAI_API_KEY", "mensaje": "Falta configurar la clave de OpenAI"},
+            0,
+        )
+
+    try:
+        client = OpenAI(api_key=api_key, max_retries=0, timeout=30.0)
+    except OpenAIError:
+        return error_estructurado(
+            "configuracion_api",
+            {"mensaje": "No se pudo inicializar el cliente de OpenAI"},
+            0,
+        )
 
     mensajes = [
         {
@@ -194,15 +207,19 @@ def ejecutar_motor(datos: dict):
                 fallos = [
                     {
                         "campo": ".".join(map(str, e["loc"])),
-                        "mensaje": e["msg"],
+                        "mensaje": (
+                            "La respuesta no contiene JSON válido"
+                            if e["type"] == "json_invalid"
+                            else e["msg"]
+                        ),
                     }
                     for e in exc.errors()
                 ]
 
-            except ValueError as exc:
+            except ValueError:
                 fallos = [{
                     "campo": "respuesta_json",
-                    "mensaje": str(exc),
+                    "mensaje": "La respuesta no contiene JSON válido",
                 }]
 
             if intento == 1:
@@ -219,20 +236,30 @@ def ejecutar_motor(datos: dict):
                     ),
                 })
 
-        except (APIConnectionError, APITimeoutError) as exc:
+        except APITimeoutError:
+            return error_estructurado("timeout_api", "APITimeoutError", intento)
+
+        except APIConnectionError:
+            return error_estructurado("conexion_api", "APIConnectionError", intento)
+
+        except APIStatusError as exc:
+            estado = exc.status_code
+            tipo = {
+                400: "solicitud_api_invalida",
+                401: "autenticacion_api",
+                403: "permiso_api",
+                429: "limite_api",
+            }.get(estado, "servidor_api" if 500 <= estado < 600 else "error_api")
             return error_estructurado(
-                "conexion_api",
-                str(type(exc).__name__),
+                tipo,
+                {"http": estado, "tipo": type(exc).__name__},
                 intento,
             )
 
-        except APIStatusError as exc:
+        except APIError:
             return error_estructurado(
                 "error_api",
-                {
-                    "http": exc.status_code,
-                    "tipo": type(exc).__name__,
-                },
+                {"mensaje": "El cliente de OpenAI no pudo procesar la respuesta"},
                 intento,
             )
 

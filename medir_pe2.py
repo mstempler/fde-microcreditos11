@@ -1,3 +1,4 @@
+import argparse
 import csv
 import json
 from pathlib import Path
@@ -55,51 +56,57 @@ CASOS = [
     },
 ]
 
-carpeta = Path("evidencias")
-carpeta.mkdir(exist_ok=True)
+def medir(carpeta: Path):
+    resultados = []
+    for numero, caso in enumerate(CASOS, start=1):
+        print(f"\nEJECUTANDO CASO {numero}/{len(CASOS)}: {caso['caso_id']}", flush=True)
+        resultado = ejecutar_motor(caso)
+        print(json.dumps(resultado, ensure_ascii=False, indent=2))
 
-resultados = []
-for numero, caso in enumerate(CASOS, start=1):
-    print(f"\nEJECUTANDO CASO {numero}/5: {caso['caso_id']}", flush=True)
-    resultado = ejecutar_motor(caso)
-    metricas = resultado.get("metricas", {})
+        if not resultado["ok"]:
+            raise SystemExit(
+                f"Medición incompleta en {caso['caso_id']}: "
+                f"{resultado['error']['tipo']}"
+            )
 
-    fila = {
-        "caso": caso["caso_id"],
-        "tipo": (
-            "prohibido" if numero == 3
-            else "ambiguo" if numero == 4
-            else "fuera_de_tema" if numero == 5
-            else "normal"
-        ),
-        "valido": resultado["ok"],
-        "tokens_entrada": metricas.get("tokens_entrada", 0),
-        "tokens_salida": metricas.get("tokens_salida", 0),
-        "costo_usd": metricas.get("costo_usd", 0),
-        "latencia_ms": metricas.get("latencia_ms", 0),
-        "intentos": resultado.get("intentos"),
-    }
+        metricas = resultado["metricas"]
+        if not metricas["tokens_entrada"] or not metricas["tokens_salida"]:
+            raise SystemExit(f"Medición incompleta en {caso['caso_id']}: faltan tokens de usage")
 
-    resultados.append(fila)
-    print(json.dumps(resultado, ensure_ascii=False, indent=2))
+        tipo = "prohibido" if caso["contacto_prohibido"] else caso.get("tipo_consulta", "normal")
+        if tipo == "ambigua":
+            tipo = "ambiguo"
 
-with (carpeta / "mediciones_pe2.csv").open(
-    "w", newline="", encoding="utf-8"
-) as archivo:
-    escritor = csv.DictWriter(archivo, fieldnames=resultados[0].keys())
-    escritor.writeheader()
-    escritor.writerows(resultados)
+        resultados.append({
+            "caso": caso["caso_id"],
+            "tipo": tipo,
+            "valido": True,
+            "tokens_entrada": metricas["tokens_entrada"],
+            "tokens_salida": metricas["tokens_salida"],
+            "costo_usd": metricas["costo_usd"],
+            "latencia_ms": metricas["latencia_ms"],
+            "intentos": resultado["intentos"],
+        })
 
-with (carpeta / "resultados_pe2.json").open(
-    "w", encoding="utf-8"
-) as archivo:
-    json.dump(resultados, archivo, ensure_ascii=False, indent=2)
+    carpeta.mkdir(parents=True, exist_ok=True)
 
-print("\nRESUMEN DE MEDICIONES")
-for fila in resultados:
-    print(fila)
+    with (carpeta / "mediciones_pe2.csv").open(
+        "w", newline="", encoding="utf-8"
+    ) as archivo:
+        escritor = csv.DictWriter(archivo, fieldnames=resultados[0].keys())
+        escritor.writeheader()
+        escritor.writerows(resultados)
 
-print("\nPROMEDIOS DE LAS CINCO CONSULTAS")
-for campo in ("tokens_entrada", "tokens_salida", "costo_usd", "latencia_ms"):
-    promedio = sum(fila[campo] for fila in resultados) / len(resultados)
-    print(f"{campo}: {promedio:.8f}")
+    with (carpeta / "resultados_pe2.json").open("w", encoding="utf-8") as archivo:
+        json.dump(resultados, archivo, ensure_ascii=False, indent=2)
+
+    print("\nPROMEDIOS DE LAS CINCO CONSULTAS")
+    for campo in ("tokens_entrada", "tokens_salida", "costo_usd", "latencia_ms"):
+        promedio = sum(fila[campo] for fila in resultados) / len(resultados)
+        print(f"{campo}: {promedio:.8f}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Mide cinco consultas reales de PE2")
+    parser.add_argument("--salida", type=Path, default=Path("evidencias"))
+    medir(parser.parse_args().salida)

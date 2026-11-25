@@ -24,9 +24,10 @@ cuentas ni autoriza acuerdos.
 ```powershell
 git clone https://github.com/mstempler/fde-microcreditos11.git
 cd fde-microcreditos11
+git switch pe2/hito1-manejo-errores-openai
 py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 ```
 
 Editar `.env` localmente y configurar `OPENAI_API_KEY`.
@@ -40,16 +41,23 @@ Nunca publicar la clave.
 
 ## Pruebas
 
-Pruebas simuladas de reintento y error persistente:
+Suite de regresión con cliente simulado y sin credenciales reales.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+Evidencia de terminal para el reintento y el error persistente.
 
 ```powershell
 .\.venv\Scripts\python.exe probar_errores_pe2.py
 ```
 
-Cinco consultas reales con mediciones:
+Cinco consultas reales con mediciones en una carpeta nueva.
 
 ```powershell
-.\.venv\Scripts\python.exe medir_pe2.py
+.\.venv\Scripts\python.exe medir_pe2.py --salida evidencias/corrida-nueva
 ```
 
 Verificación real de dos casos restringidos:
@@ -76,33 +84,42 @@ prohibido o tipo de consulta restringido.
 Las respuestas inválidas reciben un único reintento.
 Si persiste el error, se devuelve un objeto estructurado.
 
+Si falta `OPENAI_API_KEY`, el motor devuelve `configuracion_api` con cero intentos.
+Los fallos de OpenAI devuelven tipos estructurados y detalles controlados, con el estado HTTP cuando corresponde.
+
 ## Evidencia
 
-- `evidencias/mediciones_pe2.csv`: cinco consultas iniciales.
-- `evidencias/resultados_pe2.json`: resumen inicial.
-- `evidencias/verificacion_seguridad_pe2.json`:
-  verificaciones reales posteriores.
+La tanda del 25 de noviembre de 2026 usó el commit `3642a03`
+y el modelo `gpt-4.1-mini-2025-04-14`. Las cinco respuestas fueron válidas
+en el primer intento. Los tres casos restringidos quedaron bloqueados,
+sin canal y con supervisión humana.
 
-Promedios iniciales de cinco consultas:
-- Entrada: 428,8 tokens.
-- Salida: 70,8 tokens.
-- Latencia: 1.728,4 ms.
-- Costo estimado: USD 0,0002848 por consulta.
+| Caso | Tipo | Tokens entrada | Tokens salida | Costo estimado (USD) | Latencia (ms) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| MC-0001 | Normal | 447 | 117 | 0,00036600 | 3.052 |
+| MC-0002 | Normal | 446 | 132 | 0,00038960 | 2.146 |
+| MC-0003 | Contacto prohibido | 442 | 83 | 0,00030960 | 2.475 |
+| MC-0004 | Ambigua | 456 | 102 | 0,00034560 | 1.994 |
+| MC-0005 | Fuera de tema | 457 | 85 | 0,00031880 | 2.016 |
+| **Promedio** | | **449,6** | **103,8** | **0,00034592** | **2.336,6** |
 
-Costos calculados con tarifas de referencia de
-USD 0,40/M tokens de entrada y USD 1,60/M tokens
-de salida; verificar vigencia antes de citar precios
-oficiales en la entrega.
+Los tokens provienen de `usage` y la latencia mide el tiempo del motor por caso.
+El costo total estimado fue USD 0,00172960. El cálculo aplica USD 0,40 por
+millón de tokens de entrada y USD 1,60 por millón de tokens de salida.
+[Tarifas del modelo](https://developers.openai.com/api/docs/models/gpt-4.1-mini)
+
+- [Cinco respuestas completas y métricas](evidencias/corrida_pe2_2026-11-25.json).
+- [Registro de la corrida real](https://github.com/mstempler/fde-microcreditos11/actions/runs/45628736825).
+- [Ejecución de la suite con dependencias fijadas](https://github.com/mstempler/fde-microcreditos11/actions/runs/45628735545).
+- [Etiqueta histórica `pe2` (`033ef51`)](https://github.com/mstempler/fde-microcreditos11/tree/pe2).
 
 ## KPI y limitaciones
 
-KPI técnico de PE1: cobertura de recomendaciones
-para al menos el 90% de los casos elegibles.
-
-Las cinco consultas son pruebas exploratorias y no
-demuestran cumplimiento estadístico del KPI.
-Tampoco demuestran precisión de políticas sobre
-100 casos etiquetados ni impacto comercial.
+PE1 fija una cobertura de recomendaciones de al menos 90% en casos elegibles.
+En esta muestra, los dos casos elegibles recibieron una recomendación de canal
+(2/2, 100% observado). Los tres casos restringidos quedan fuera del denominador.
+El tamaño de la muestra es insuficiente para validar la meta del 90%.
+Los promedios de tokens, costo y latencia describen el desempeño operativo.
 
 La clasificación `tipo_consulta` llega como dato de
 entrada: no se demuestra detección autónoma de
